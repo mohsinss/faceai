@@ -52,21 +52,24 @@ const VoiceChat = ({ className, analyticsId }) => {
         
         switch (response.type) {
           case 'chat_metadata':
-            // Store chat metadata if needed
             console.log('Chat session initialized:', response.chat_id);
             break;
             
           case 'user_message':
             if (response.message?.content) {
-              setTranscript(response.message.content);
-              // Add user message to messages list
-              if (!response.interim) { // Only add final transcripts
-                setMessages(prev => [...prev, {
-                  content: response.message.content,
-                  isUser: true,
-                  timestamp: new Date(),
-                  interim: response.interim
-                }]);
+              if (response.interim) {
+                setTranscript(response.message.content);
+              } else {
+                setTranscript(response.message.content);
+                setMessages(prev => {
+                  const filteredMessages = prev.filter(m => !m.interim);
+                  return [...filteredMessages, {
+                    content: response.message.content,
+                    isUser: true,
+                    timestamp: new Date(),
+                    interim: false
+                  }];
+                });
               }
             }
             break;
@@ -79,6 +82,7 @@ const VoiceChat = ({ className, analyticsId }) => {
                 timestamp: new Date(),
                 prosody: response.data?.prosody
               }]);
+              setTranscript('');
             }
             break;
             
@@ -132,7 +136,8 @@ const VoiceChat = ({ className, analyticsId }) => {
       setStatus('Microphone access granted');
 
       const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm;codecs=opus'
+        mimeType: 'audio/webm;codecs=opus',
+        bitsPerSecond: 128000
       });
       
       mediaRecorder.ondataavailable = (event) => {
@@ -148,17 +153,15 @@ const VoiceChat = ({ className, analyticsId }) => {
         audioChunksRef.current = [];
         
         if (webSocketRef.current?.readyState === WebSocket.OPEN) {
-          // Convert blob to base64
           const reader = new FileReader();
           reader.onloadend = () => {
             const base64Audio = reader.result.split(',')[1];
-            // Send the audio data in the exact format expected by Hume
             const message = {
               type: 'audio_input',
               data: base64Audio
             };
             
-            console.log('Sending audio message:', message);
+            console.log('Sending audio message of size:', base64Audio.length);
             webSocketRef.current.send(JSON.stringify(message));
             setStatus('Audio sent to server');
           };
@@ -170,7 +173,7 @@ const VoiceChat = ({ className, analyticsId }) => {
       };
 
       mediaRecorderRef.current = mediaRecorder;
-      mediaRecorder.start(100);
+      mediaRecorder.start(250);
       setIsRecording(true);
       await initializeWebSocket();
     } catch (error) {
