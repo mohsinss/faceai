@@ -51,11 +51,26 @@ const VoiceChat = ({ className, analyticsId }) => {
         setStatus(`Received message: ${response.type}`);
         
         switch (response.type) {
+          case 'chat_metadata':
+            // Store chat metadata if needed
+            console.log('Chat session initialized:', response.chat_id);
+            break;
+            
           case 'user_message':
-            if (response.data?.text) {
-              setTranscript(response.data.text);
+            if (response.message?.content) {
+              setTranscript(response.message.content);
+              // Add user message to messages list
+              if (!response.interim) { // Only add final transcripts
+                setMessages(prev => [...prev, {
+                  content: response.message.content,
+                  isUser: true,
+                  timestamp: new Date(),
+                  interim: response.interim
+                }]);
+              }
             }
             break;
+            
           case 'assistant_message':
             if (response.data?.text) {
               setMessages(prev => [...prev, {
@@ -66,14 +81,15 @@ const VoiceChat = ({ className, analyticsId }) => {
               }]);
             }
             break;
+            
           case 'audio_output':
             if (response.data?.content) {
               const audio = new Audio(`data:audio/wav;base64,${response.data.content}`);
               audio.play();
             }
             break;
+            
           case 'error':
-            // Handle different error message formats
             const errorMessage = response.data?.message || 
                                response.message || 
                                response.error || 
@@ -82,8 +98,9 @@ const VoiceChat = ({ className, analyticsId }) => {
             setError(`EVI error: ${errorMessage}`);
             console.error('WebSocket error:', response);
             break;
+            
           default:
-            console.log('Unhandled message type:', response.type);
+            console.log('Message received:', response);
         }
       };
 
@@ -135,13 +152,14 @@ const VoiceChat = ({ className, analyticsId }) => {
           const reader = new FileReader();
           reader.onloadend = () => {
             const base64Audio = reader.result.split(',')[1];
-            webSocketRef.current.send(JSON.stringify({
-              type: 'audio',
-              data: {
-                content: base64Audio,
-                encoding: 'webm'
-              }
-            }));
+            // Send the audio data in the exact format expected by Hume
+            const message = {
+              type: 'audio_input',
+              data: base64Audio
+            };
+            
+            console.log('Sending audio message:', message);
+            webSocketRef.current.send(JSON.stringify(message));
             setStatus('Audio sent to server');
           };
           reader.readAsDataURL(audioBlob);
@@ -195,35 +213,33 @@ const VoiceChat = ({ className, analyticsId }) => {
       )}
 
       {/* Messages Display */}
-      <div style={{
-        flexGrow: 1,
-        padding: '1rem',
-        overflowY: 'auto',
-        msOverflowStyle: 'none',
-        scrollbarWidth: 'none',
-        WebkitOverflowScrolling: 'touch'
-      }}>
+      <div className="flex-grow p-4 overflow-y-auto space-y-4">
         {messages.map((message, index) => (
-          <div key={index} style={{
-            marginBottom: '1rem',
-            padding: '0.75rem',
-            backgroundColor: message.isUser ? '#f3f4f6' : '#e0f2fe',
-            borderRadius: '0.5rem',
-          }}>
-            <p>{message.content}</p>
+          <div
+            key={index}
+            className={`p-3 rounded-lg ${
+              message.isUser 
+                ? 'bg-blue-100 ml-auto max-w-[80%]' 
+                : 'bg-gray-100 mr-auto max-w-[80%]'
+            }`}
+          >
+            <p className="text-gray-800">{message.content}</p>
             {message.prosody && (
               <div className="text-xs text-gray-500 mt-1">
-                Expression: {JSON.stringify(message.prosody)}
+                Prosody: {JSON.stringify(message.prosody)}
               </div>
             )}
+            <div className="text-xs text-gray-500 mt-1">
+              {new Date(message.timestamp).toLocaleTimeString()}
+            </div>
           </div>
         ))}
       </div>
 
       {/* Live Transcript */}
       {transcript && (
-        <div className="px-4 py-2 bg-gray-50 text-sm text-gray-600">
-          Transcript: {transcript}
+        <div className="px-4 py-2 bg-yellow-50 text-sm text-yellow-700">
+          Live Transcript: {transcript}
         </div>
       )}
 
