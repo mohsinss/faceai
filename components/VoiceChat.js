@@ -57,10 +57,8 @@ const VoiceChat = ({ className, analyticsId }) => {
             
           case 'user_message':
             if (response.message?.content) {
-              if (response.interim) {
-                setTranscript(response.message.content);
-              } else {
-                setTranscript(response.message.content);
+              setTranscript(response.message.content);
+              if (!response.interim) {
                 setMessages(prev => {
                   const filteredMessages = prev.filter(m => !m.interim);
                   return [...filteredMessages, {
@@ -75,22 +73,28 @@ const VoiceChat = ({ className, analyticsId }) => {
             break;
             
           case 'assistant_message':
-            if (response.data?.text) {
+            if (response.message?.content) {
               setMessages(prev => [...prev, {
-                content: response.data.text,
+                content: response.message.content,
                 isUser: false,
                 timestamp: new Date(),
-                prosody: response.data?.prosody
+                messageId: response.id
               }]);
               setTranscript('');
             }
             break;
             
           case 'audio_output':
-            if (response.data?.content) {
-              const audio = new Audio(`data:audio/wav;base64,${response.data.content}`);
-              audio.play();
+            if (response.data) {
+              const audio = new Audio(`data:audio/wav;base64,${response.data}`);
+              audio.play().catch(error => {
+                console.error('Error playing audio:', error);
+              });
             }
+            break;
+            
+          case 'assistant_end':
+            setIsProcessing(false);
             break;
             
           case 'error':
@@ -101,6 +105,7 @@ const VoiceChat = ({ className, analyticsId }) => {
                                'Unknown error occurred';
             setError(`EVI error: ${errorMessage}`);
             console.error('WebSocket error:', response);
+            setIsProcessing(false);
             break;
             
           default:

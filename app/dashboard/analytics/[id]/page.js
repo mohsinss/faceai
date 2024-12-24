@@ -6,6 +6,7 @@ import MainNavbar from '@/components/MainNavbar';
 import MainSideNavbar from '@/components/MainSideNavbar';
 import ChatBot from '@/components/ChatBot';
 import VoiceChat from '@/components/VoiceChat';
+import StreamMeasurements from '@/components/StreamMeasurements';
 
 const AnalyticsDetail = () => {
   const params = useParams();
@@ -144,95 +145,99 @@ const AnalyticsDetail = () => {
       <div className="flex flex-col flex-grow">
         <MainNavbar />
         <div className="flex flex-grow p-6 ml-16 space-x-6">
-          {/* Chat Interfaces */}
+          {/* Chat and Voice Interfaces */}
           <div className="w-1/2 flex flex-col space-y-6">
             <ChatBot className="flex-1" analyticsId={params.id} />
             <VoiceChat className="flex-1" analyticsId={params.id} />
           </div>
 
-          Analytics Form Section
-          {/* <div className="w-1/2 bg-white rounded-lg shadow-md p-6">
-            <h1 className="text-2xl font-bold text-blue-600 mb-4">{analytics.title}</h1>
-            <input
-              type="text"
-              name="title"
-              value={analytics.title}
-              onChange={handleChange}
-              placeholder="Title"
-              className="w-full p-2 mb-4 border border-gray-300 rounded"
-            />
-            <input
-              type="text"
-              name="name"
-              value={analytics.name}
-              onChange={handleChange}
-              placeholder="Name"
-              className="w-full p-2 mb-4 border border-gray-300 rounded"
-            />
-            <input
-              type="email"
-              name="email"
-              value={analytics.email}
-              onChange={handleChange}
-              placeholder="Email"
-              className="w-full p-2 mb-4 border border-gray-300 rounded"
-            />
-            <textarea
-              name="description"
-              value={analytics.description}
-              onChange={handleChange}
-              placeholder="Description"
-              className="w-full p-2 mb-4 border border-gray-300 rounded"
-              rows="4"
-            ></textarea>
-            <button 
-              onClick={handleGenerate}
-              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors mb-4"
-            >
-              Generate
-            </button>
-            <div className="mb-4">
-              <div className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  value={newTag}
-                  onChange={(e) => setNewTag(e.target.value)}
-                  placeholder="Add a tag..."
-                  className="flex-grow p-2 border border-gray-300 rounded"
-                />
-                <button
-                  onClick={handleAddTag}
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                >
-                  Add Tag
-                </button>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {analytics.generatedEmail?.split(',').map((tag, index) => (
-                  tag.trim() && (
-                    <div
-                      key={index}
-                      className="group relative inline-flex items-center bg-gray-100 px-3 py-1 rounded-full"
-                    >
-                      {tag.trim()}
-                      <button
-                        onClick={() => handleDeleteTag(tag.trim())}
-                        className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700"
+          {/* Stream Measurements and Analytics */}
+          <div className="w-1/2 flex flex-col space-y-6">
+            <StreamMeasurements className="flex-1" />
+            {/* Analytics Form Section */}
+            {/* <div className="w-1/2 bg-white rounded-lg shadow-md p-6">
+              <h1 className="text-2xl font-bold text-blue-600 mb-4">{analytics.title}</h1>
+              <input
+                type="text"
+                name="title"
+                value={analytics.title}
+                onChange={handleChange}
+                placeholder="Title"
+                className="w-full p-2 mb-4 border border-gray-300 rounded"
+              />
+              <input
+                type="text"
+                name="name"
+                value={analytics.name}
+                onChange={handleChange}
+                placeholder="Name"
+                className="w-full p-2 mb-4 border border-gray-300 rounded"
+              />
+              <input
+                type="email"
+                name="email"
+                value={analytics.email}
+                onChange={handleChange}
+                placeholder="Email"
+                className="w-full p-2 mb-4 border border-gray-300 rounded"
+              />
+              <textarea
+                name="description"
+                value={analytics.description}
+                onChange={handleChange}
+                placeholder="Description"
+                className="w-full p-2 mb-4 border border-gray-300 rounded"
+                rows="4"
+              ></textarea>
+              <button 
+                onClick={handleGenerate}
+                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors mb-4"
+              >
+                Generate
+              </button>
+              <div className="mb-4">
+                <div className="flex gap-2 mb-2">
+                  <input
+                    type="text"
+                    value={newTag}
+                    onChange={(e) => setNewTag(e.target.value)}
+                    placeholder="Add a tag..."
+                    className="flex-grow p-2 border border-gray-300 rounded"
+                  />
+                  <button
+                    onClick={handleAddTag}
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                  >
+                    Add Tag
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {analytics.generatedEmail?.split(',').map((tag, index) => (
+                    tag.trim() && (
+                      <div
+                        key={index}
+                        className="group relative inline-flex items-center bg-gray-100 px-3 py-1 rounded-full"
                       >
-                        ×
-                      </button>
-                    </div>
-                  )
-                ))}
+                        {tag.trim()}
+                        <button
+                          onClick={() => handleDeleteTag(tag.trim())}
+                          className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    )
+                  ))}
+                </div>
               </div>
-            </div>
-            <button 
-              onClick={handleSubmit} 
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-            >
-              Save
-            </button>
-          </div> */}
+              <button 
+                onClick={handleSubmit} 
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+              >
+                Save
+              </button>
+            </div> */}
+          </div>
         </div>
       </div>
     </div>
