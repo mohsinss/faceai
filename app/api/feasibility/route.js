@@ -6,7 +6,7 @@ import { ObjectId } from 'mongodb';
 export async function POST(req) {
   try {
     const db = await getDb();
-    const collection = db.collection(process.env.MONGODB_COLLECTION || "feasibilities");
+    const collection = db.collection(process.env.MONGODB_COLLECTION || "analytics");
     const body = await req.json();
 
     if (body._id) {
@@ -31,7 +31,7 @@ export async function POST(req) {
         });
       }
 
-      return new Response(JSON.stringify({ message: 'Feasibility study saved successfully' }), {
+      return new Response(JSON.stringify({ message: 'Analytics saved successfully' }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
       });
@@ -64,7 +64,7 @@ export async function GET(req) {
 
   try {
     const db = await getDb();
-    const collection = db.collection(process.env.MONGODB_COLLECTION || "feasibilities");
+    const collection = db.collection(process.env.MONGODB_COLLECTION || "analytics");
 
     if (id) {
       id = id.replace(/[^0-9a-fA-F]/g, '');
@@ -76,9 +76,9 @@ export async function GET(req) {
         });
       }
 
-      const feasibility = await collection.findOne({ _id: new ObjectId(id) });
+      const analytics = await collection.findOne({ _id: new ObjectId(id) });
       
-      if (!feasibility) {
+      if (!analytics) {
         return new Response(JSON.stringify({ error: 'Document not found' }), {
           status: 404,
           headers: { 'Content-Type': 'application/json' },
@@ -86,34 +86,34 @@ export async function GET(req) {
       }
 
       // Fetch related businessDescription and marketAnalysis
-      const businessDescription = await db.collection("businessDescriptions").findOne({ feasibilityId: new ObjectId(id) });
-      const marketAnalysis = await db.collection("marketAnalyses").findOne({ feasibilityId: new ObjectId(id) });
+      const businessDescription = await db.collection("businessDescriptions").findOne({ analyticsId: new ObjectId(id) });
+      const marketAnalysis = await db.collection("marketAnalyses").findOne({ analyticsId: new ObjectId(id) });
 
       // Combine the data
-      const populatedFeasibility = {
-        ...feasibility,
+      const populatedAnalytics = {
+        ...analytics,
         businessDescription,
         marketAnalysis,
-        generatedContent: feasibility.generatedContent || '',
-        contentLength: feasibility.contentLength || 'medium',
-        tone: feasibility.tone || 'professional',
-        language: feasibility.language || 'English',
-        temperature: feasibility.temperature || 0.7,
+        generatedContent: analytics.generatedContent || '',
+        contentLength: analytics.contentLength || 'medium',
+        tone: analytics.tone || 'professional',
+        language: analytics.language || 'English',
+        temperature: analytics.temperature || 0.7,
       };
 
-      return new Response(JSON.stringify(populatedFeasibility), {
+      return new Response(JSON.stringify(populatedAnalytics), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
       });
     }
 
     // Fetch all documents, sorted by createdAt in descending order
-    const feasibilities = await collection
+    const analytics = await collection
       .find({})
       .sort({ createdAt: -1 })
       .toArray();
 
-    return new Response(JSON.stringify(feasibilities), {
+    return new Response(JSON.stringify(analytics), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
@@ -129,7 +129,7 @@ export async function GET(req) {
 export async function DELETE(req) {
   try {
     const db = await getDb();
-    const collection = db.collection(process.env.MONGODB_COLLECTION || "feasibilities");
+    const collection = db.collection(process.env.MONGODB_COLLECTION || "analytics");
     const { id } = await req.json();
 
     const result = await collection.deleteOne({ _id: new ObjectId(id) });

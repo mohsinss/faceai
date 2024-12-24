@@ -40,7 +40,7 @@ const MainNavbar = () => {
               Dashboard Home
             </span>
           </Link>
-          <Link href="/dashboard/feasibility">
+          <Link href="/dashboard/analytics">
             <span style={{
               color: '#0070f3',
               fontSize: '1rem',
@@ -49,7 +49,7 @@ const MainNavbar = () => {
               cursor: 'pointer',
               transition: 'color 0.2s'
             }} className="hover:text-blue-600">
-              Feasibility
+              Analytics
             </span>
           </Link>
           {/* Add more links as needed */}

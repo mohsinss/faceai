@@ -1,77 +1,80 @@
 "use client";
 
-
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import DashNav from "./DashNav";
-import FeasibilityCard from '@/components/FeasibilityCard';
+import AnalyticsCard from '@/components/AnalyticsCard';
 
 export default function Dashboard() {
   const router = useRouter();
-  const [feasibilities, setFeasibilities] = useState([]);
+  const [analytics, setAnalytics] = useState([]);
 
   useEffect(() => {
-    fetchFeasibilities();
+    fetchAnalytics();
   }, []);
 
-  const fetchFeasibilities = async () => {
+  const fetchAnalytics = async () => {
     try {
-      const response = await fetch('/api/feasibility');
+      const response = await fetch('/api/analytics');
       if (!response.ok) {
-        throw new Error('Failed to fetch feasibilities');
+        throw new Error('Failed to fetch analytics');
       }
       const data = await response.json();
-      setFeasibilities(data);
+      setAnalytics(data);
     } catch (error) {
-      console.error('Error fetching feasibilities:', error);
-      // Optionally, show an error message to the user
+      console.error('Error fetching analytics:', error);
     }
   };
 
   const formatObjectId = (id) => {
-    // Remove any non-hexadecimal characters
     return id.replace(/[^0-9a-fA-F]/g, '');
   };
 
   const handleCreateResume = async () => {
     try {
-      const response = await fetch('/api/feasibility', {
+      const response = await fetch('/api/analytics', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ title: 'New Resume' }),
+        body: JSON.stringify({ 
+          title: 'New Resume',
+          name: '',
+          email: '',
+          generatedEmail: ''
+        }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create a new resume');
+        const errorData = await response.json();
+        throw new Error(`Failed to create resume: ${errorData.error || response.statusText}`);
       }
 
       const data = await response.json();
+      console.log('Create response:', data);
 
       if (!data.documentId) {
         throw new Error('Invalid response from server: missing documentId');
       }
 
       const formattedId = formatObjectId(data.documentId);
-
-      router.push(`/dashboard/feasibility/${formattedId}`);
+      router.push(`/dashboard/analytics/${formattedId}`);
     } catch (error) {
       console.error('Error creating resume:', error);
-      alert('Error creating resume. Please try again.');
+      alert(`Error creating resume: ${error.message}`);
     }
   };
   
-  const handleDeleteFeasibility = async (id) => {
+  const handleDeleteAnalytics = async (id) => {
     if (confirm('Are you sure you want to delete this document?')) {
-      await fetch('/api/feasibility', {
+      await fetch('/api/analytics', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ id }),
       });
-      fetchFeasibilities();
+      fetchAnalytics();
     }
   };
 
@@ -161,12 +164,12 @@ export default function Dashboard() {
           gap: '20px',
           marginTop: '20px',
         }}>
-          {feasibilities.map((feasibility) => (
-            <FeasibilityCard
-              key={feasibility._id}
-              feasibility={feasibility}
-              onDelete={() => handleDeleteFeasibility(feasibility._id)}
-              onClick={() => router.push(`/dashboard/feasibility/${feasibility._id}`)}
+          {analytics.map((analytic) => (
+            <AnalyticsCard
+              key={analytic._id}
+              analytics={analytic}
+              onDelete={() => handleDeleteAnalytics(analytic._id)}
+              onClick={() => router.push(`/dashboard/analytics/${analytic._id}`)}
             />
           ))}
         </div>

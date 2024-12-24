@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-export default function FeasibilityCard({ feasibility, onDelete, onClick }) {
+export default function AnalyticsCard({ analytics, onDelete, onClick }) {
   const [showDelete, setShowDelete] = useState(false);
 
   return (
@@ -20,10 +20,10 @@ export default function FeasibilityCard({ feasibility, onDelete, onClick }) {
       onClick={onClick}
     >
       <h3 style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '10px', color: '#0070f3' }}>
-        {feasibility.title || 'Untitled'}
+        {analytics.title || 'Untitled'}
       </h3>
       <p style={{ fontSize: '0.9rem', color: '#666' }}>
-        Created: {new Date(feasibility.createdAt).toLocaleDateString()}
+        Created: {new Date(analytics.createdAt).toLocaleDateString()}
       </p>
       {showDelete && (
         <button

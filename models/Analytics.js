@@ -30,4 +30,4 @@ const analyticsSchema = mongoose.Schema(
 
 analyticsSchema.plugin(toJSON);
 
-export default mongoose.models.Analytics || mongoose.model("Analytics", analyticsSchema);
+export default mongoose.models.Analytics || mongoose.model("Analytics", analyticsSchema); 
