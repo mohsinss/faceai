@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import MainNavbar from '@/components/MainNavbar';
 import MainSideNavbar from '@/components/MainSideNavbar';
 import ChatBot from '@/components/ChatBot';
+import VoiceChat from '@/components/VoiceChat';
 
 const AnalyticsDetail = () => {
   const params = useParams();
@@ -143,11 +144,14 @@ const AnalyticsDetail = () => {
       <div className="flex flex-col flex-grow">
         <MainNavbar />
         <div className="flex flex-grow p-6 ml-16 space-x-6">
-          {/* Chatbot Section */}
-          <ChatBot className="w-1/2" analyticsId={params.id} />
+          {/* Chat Interfaces */}
+          <div className="w-1/2 flex flex-col space-y-6">
+            <ChatBot className="flex-1" analyticsId={params.id} />
+            <VoiceChat className="flex-1" analyticsId={params.id} />
+          </div>
 
-          {/* Analytics Form Section */}
-          <div className="w-1/2 bg-white rounded-lg shadow-md p-6">
+          Analytics Form Section
+          {/* <div className="w-1/2 bg-white rounded-lg shadow-md p-6">
             <h1 className="text-2xl font-bold text-blue-600 mb-4">{analytics.title}</h1>
             <input
               type="text"
@@ -228,7 +232,7 @@ const AnalyticsDetail = () => {
             >
               Save
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

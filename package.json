@@ -41,7 +41,8 @@
     "react-tooltip": "^5.26.3",
     "stripe": "^13.11.0",
     "tailwind-merge": "^2.5.2",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "websocket": "^1.0.35"
   },
   "devDependencies": {
     "@shadcn/ui": "^0.0.4",
